@@ -1,0 +1,13 @@
+@echo off
+echo Starting Smart Healthcare Management System...
+
+echo Starting ML Backend (Port 8000)...
+start cmd /k "cd ml-backend && pip install -r requirements.txt && python generate_datasets.py && python train_models.py && uvicorn main:app --reload --port 8000"
+
+echo Starting Node.js Backend (Port 3001)...
+start cmd /k "cd backend && npm install && node server.js"
+
+echo Starting Frontend (Port 5173)...
+start cmd /k "cd frontend && npm install && npm run dev"
+
+echo All services are starting up in separate windows!
