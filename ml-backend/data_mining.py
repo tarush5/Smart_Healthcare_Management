@@ -9,7 +9,14 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from mlxtend.frequent_patterns import apriori, association_rules
 
-DATASET_DIR = os.path.join(os.path.dirname(__file__), '..', 'datasets')
+# Container-safe path resolution
+def get_path(folder_name):
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    if base_dir == '/' or base_dir == '':
+        return os.path.join(os.path.dirname(__file__), folder_name)
+    return os.path.join(base_dir, folder_name)
+
+DATASET_DIR = get_path('datasets')
 
 
 def get_association_rules():

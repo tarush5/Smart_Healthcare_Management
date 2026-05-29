@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell,
+  ScatterChart, Scatter, AreaChart, Area, Legend, ZAxis
 } from 'recharts'
-import { ShieldAlert, AlertTriangle, CheckCircle } from 'lucide-react'
-
-const ML_URL = 'http://localhost:8000'
+import { ShieldAlert, AlertTriangle, CheckCircle, Activity, HeartPulse, Brain } from 'lucide-react'
+import { ML_URL, API_URL } from '../config'
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
@@ -43,12 +43,36 @@ function RiskGauge({ score, level }) {
 }
 
 export default function RiskAnalytics() {
+  const [activeTab, setActiveTab] = useState('individual')
+  const [populationData, setPopulationData] = useState(null)
   const [form, setForm] = useState({
     age: '', gender: 'Male', bmi: '', blood_pressure: '', cholesterol: '',
     glucose: '', smoking: false, family_history: false, exercise: true
   })
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    fetch(`${API_URL}/analytics/risk-trends`)
+      .then(r => r.json())
+      .then(d => setPopulationData(d.records))
+      .catch(e => console.error(e))
+  }, [])
+
+  const riskByGenderData = []
+  if (populationData) {
+    ['Male', 'Female'].forEach(g => {
+      const records = populationData.filter(d => d.gender === g)
+      if (records.length) {
+         riskByGenderData.push({
+           gender: g,
+           Low: records.filter(d => d.risk_level === 'Low').length,
+           Medium: records.filter(d => d.risk_level === 'Medium').length,
+           High: records.filter(d => ['High', 'Critical'].includes(d.risk_level)).length
+         })
+      }
+    })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -91,8 +115,21 @@ export default function RiskAnalytics() {
         <p>Comprehensive health risk assessment with multi-disease scoring</p>
       </div>
 
-      <div className="charts-grid">
-        {/* Risk Assessment Form */}
+      <div className="tabs">
+        <button className={`tab ${activeTab === 'individual' ? 'active' : ''}`}
+                onClick={() => setActiveTab('individual')}>
+          👤 Individual Assessment
+        </button>
+        <button className={`tab ${activeTab === 'population' ? 'active' : ''}`}
+                onClick={() => setActiveTab('population')}>
+          🌍 Population Analytics
+        </button>
+      </div>
+
+      {activeTab === 'individual' && (
+        <div className="slide-up">
+          <div className="charts-grid">
+            {/* Risk Assessment Form */}
         <div className="card">
           <div className="card-header">
             <div>
@@ -250,6 +287,90 @@ export default function RiskAnalytics() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+        </div>
+      )}
+
+      {/* Population Analytics Tab */}
+      {activeTab === 'population' && (
+        <div className="slide-up">
+          <div className="charts-grid">
+            
+            {/* Age vs Risk Probability Scatter Plot */}
+            <div className="card" style={{ gridColumn: '1 / -1' }}>
+              <div className="card-header">
+                <div>
+                  <div className="card-title">📈 Age vs Risk Probability</div>
+                  <div className="card-subtitle">Distribution of predicted risks across patient ages</div>
+                </div>
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                  <XAxis type="number" dataKey="age" name="Age" stroke="#64748b" label={{ value: 'Age', position: 'insideBottom', fill: '#64748b', offset: -10 }} />
+                  <YAxis type="number" dataKey="probability" name="Probability" unit="%" stroke="#64748b" label={{ value: 'Probability (%)', angle: -90, position: 'insideLeft', fill: '#64748b' }} />
+                  <ZAxis type="category" dataKey="disease" name="Disease" />
+                  <Tooltip cursor={{ strokeDasharray: '3 3' }} content={<CustomTooltip />} />
+                  <Legend formatter={(v) => <span style={{ color: '#94a3b8', fontSize: 12 }}>{v}</span>} />
+                  
+                  {populationData && ['Heart Disease', 'Diabetes', 'Kidney Disease'].map((disease, i) => {
+                    const colors = ['#ef4444', '#f59e0b', '#8b5cf6']
+                    const data = populationData.filter(d => d.disease_type === disease)
+                    return <Scatter key={disease} name={disease} data={data} fill={colors[i]} fillOpacity={0.6} />
+                  })}
+                </ScatterChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Risk Distribution by Gender Stacked Bar */}
+            <div className="card">
+              <div className="card-header">
+                <div>
+                  <div className="card-title">🚻 Risk Distribution by Gender</div>
+                  <div className="card-subtitle">Proportion of risk levels across genders</div>
+                </div>
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={riskByGenderData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                  <XAxis dataKey="gender" stroke="#64748b" fontSize={12} />
+                  <YAxis stroke="#64748b" fontSize={12} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend formatter={(v) => <span style={{ color: '#94a3b8', fontSize: 12 }}>{v}</span>} />
+                  <Bar dataKey="Low" stackId="a" fill="#22c55e" />
+                  <Bar dataKey="Medium" stackId="a" fill="#f59e0b" />
+                  <Bar dataKey="High" stackId="a" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Probability Density Area */}
+            <div className="card">
+              <div className="card-header">
+                <div>
+                  <div className="card-title">🔬 Risk Probability Density</div>
+                  <div className="card-subtitle">Area chart representing probability trend</div>
+                </div>
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={populationData && populationData.slice().sort((a,b) => a.probability - b.probability)} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorProb" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="probability" stroke="#64748b" fontSize={12} />
+                  <YAxis stroke="#64748b" fontSize={12} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey="probability" stroke="#3b82f6" fillOpacity={1} fill="url(#colorProb)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
           </div>
         </div>
       )}

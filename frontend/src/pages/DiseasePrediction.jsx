@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { HeartPulse, Droplets, Bean, Brain } from 'lucide-react'
 import ImageUploadScanner from '../components/ImageUploadScanner'
-
-const ML_URL = 'http://localhost:8000'
+import { ML_URL, API_URL } from '../config'
 
 const DISEASE_CONFIGS = {
   heart: {
@@ -130,7 +129,7 @@ export default function DiseasePrediction() {
       setResult(data)
 
       // Save prediction to backend
-      fetch('http://localhost:3001/api/predictions', {
+      fetch(`${API_URL}/predictions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

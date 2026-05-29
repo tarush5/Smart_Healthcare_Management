@@ -9,3 +9,6 @@ __pycache__/
 .DS_Store
 *.sqlite
 *.sqlite3
+backend/healthcare.db
+backend/healthcare.db-shm
+backend/healthcare.db-wal

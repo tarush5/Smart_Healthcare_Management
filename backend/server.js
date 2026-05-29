@@ -5,17 +5,32 @@
 const express = require('express');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 const { initDatabase } = require('./database');
 
+// Load .env if dotenv is available
+try { require('dotenv').config(); } catch(e) { /* dotenv optional */ }
+
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: CORS_ORIGIN === '*' ? true : CORS_ORIGIN,
+  credentials: true
+}));
 app.use(express.json());
 
 // Initialize database
-const db = initDatabase();
+let db;
+try {
+  db = initDatabase();
+  console.log('✅ Database initialized successfully');
+} catch (err) {
+  console.error('❌ Database initialization failed:', err.message);
+  process.exit(1);
+}
 
 // ==================== Patient Endpoints ====================
 
@@ -181,6 +196,25 @@ app.post('/api/predictions', (req, res) => {
   }
 });
 
+// ==================== Analytics ====================
+app.get('/api/analytics/risk-trends', (req, res) => {
+  try {
+    const records = db.prepare(`
+      SELECT p.id, p.disease_type, p.risk_level, p.probability, 
+             pt.age, pt.gender, pt.blood_group,
+             m.bmi, m.cholesterol, m.bp_systolic
+      FROM predictions p
+      JOIN patients pt ON p.patient_id = pt.id
+      LEFT JOIN medical_records m ON m.patient_id = pt.id
+      GROUP BY p.id
+      ORDER BY p.created_at DESC
+    `).all();
+    res.json({ records });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ==================== Dashboard Stats ====================
 
 app.get('/api/stats', (req, res) => {
@@ -224,13 +258,26 @@ app.get('/api/stats', (req, res) => {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'healthy', timestamp: new Date().toISOString() });
+  try {
+    const patientCount = db.prepare('SELECT COUNT(*) as count FROM patients').get().count;
+    const predictionCount = db.prepare('SELECT COUNT(*) as count FROM predictions').get().count;
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      database: { connected: true, patients: patientCount, predictions: predictionCount }
+    });
+  } catch (err) {
+    res.status(503).json({ status: 'unhealthy', error: err.message });
+  }
 });
 
 // Start server
 app.listen(PORT, () => {
   console.log(`\n🏥 Healthcare API running on http://localhost:${PORT}`);
+  console.log(`🔒 CORS origin: ${CORS_ORIGIN}`);
   console.log(`📊 Endpoints:`);
+  console.log(`   GET    /api/health`);
   console.log(`   GET    /api/patients`);
   console.log(`   POST   /api/patients`);
   console.log(`   GET    /api/patients/:id`);

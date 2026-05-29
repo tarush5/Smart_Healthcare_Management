@@ -1,58 +1,58 @@
 # 🧠 Smart Healthcare Management System
 
-> AI-Powered Healthcare Management with Machine Learning & Data Mining
-
-An intelligent healthcare management system that analyzes patient data, predicts diseases, discovers hidden patterns through data mining, and assists doctors in clinical decision-making.
+An AI-powered healthcare analytics platform combining ML disease prediction, data mining, risk assessment, and patient management.
 
 ## 🏗️ Architecture
 
-| Component | Technology | Port |
-|-----------|-----------|------|
-| Frontend | React + Vite | 5173 |
-| API Gateway | Node.js + Express | 3001 |
-| ML Backend | Python + FastAPI | 8000 |
-| Database | SQLite | — |
+```
+┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐
+│  React Frontend  │───▶│ Node.js Backend  │    │  FastAPI ML API  │
+│   (Port 5173)    │    │   (Port 3001)    │    │   (Port 8000)    │
+│                  │───▶│                  │    │                  │
+│  Dashboard       │    │  Patient CRUD    │    │  Disease Pred.   │
+│  Predictions     │    │  Medical Records │    │  Data Mining     │
+│  Data Mining     │    │  Prediction DB   │    │  Risk Assessment │
+│  Risk Analytics  │    │  Analytics       │    │  AI Chatbot      │
+│  Visualizations  │    │  SQLite DB       │    │  OCR Scanner     │
+│  AI Chatbot      │    │                  │    │  Visualizations  │
+└──────────────────┘    └──────────────────┘    └──────────────────┘
+```
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.9+
-- Node.js 18+
-- npm
+- Python 3.9+ with pip
+- Node.js 18+ with npm
 
-### 1. Setup ML Backend
+### One-Command Start
 ```bash
-cd ml-backend
-pip install -r requirements.txt
-python generate_datasets.py
-python train_models.py
-uvicorn main:app --reload --port 8000
+cd project
+run_all.bat
 ```
 
-### 2. Setup Node.js Backend
-```bash
-cd backend
-npm install
-node server.js
-```
+> The ML backend takes 2-3 minutes to start (training models). The sidebar shows live health indicators.
 
-### 3. Setup Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
+## 📦 Tech Stack
 
-## 🔬 AI/ML Features
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, Vite, Recharts, Lucide Icons |
+| API Backend | Node.js, Express, better-sqlite3 |
+| ML Backend | Python, FastAPI, scikit-learn, pandas |
+| Database | SQLite (WAL mode) |
+| ML Models | Logistic Regression, Random Forest, Decision Tree, SVM |
+| Data Mining | Apriori (mlxtend), K-Means (sklearn) |
 
-- **Disease Prediction**: Heart Disease, Diabetes, Kidney Disease using Random Forest, SVM, Logistic Regression, Decision Tree
-- **Data Mining**: Association Rule Mining (Apriori), K-Means Clustering, Pattern Discovery
-- **Risk Assessment**: Patient risk scoring with probability percentages
-- **AI Chatbot**: Symptom-based health advice assistant
+## 🔬 Features
 
-## 📊 Tech Stack
+- **Disease Prediction** — Heart (13 features), Diabetes (8), Kidney (20)
+- **Data Mining** — Association Rules, K-Means Clustering, Pattern Discovery
+- **Risk Analytics** — Individual + population risk with recommendations
+- **AI Chatbot** — Symptom checker with urgency triage
+- **Medical Report Scanner** — OCR-based multi-disease analysis
+- **20+ ML Visualizations** — EDA, model evaluation, mining, dashboards
 
-- **Frontend**: React, Vite, Recharts, Modern CSS
-- **Backend**: Node.js, Express, SQLite
-- **ML Backend**: Python, FastAPI, Scikit-learn, Pandas, NumPy, mlxtend
-- **ML Models**: Random Forest, SVM, Logistic Regression, Decision Tree, K-Means, Apriori
+## 🔧 Configuration
+
+Frontend `.env`: `VITE_API_URL`, `VITE_ML_URL`
+Backend `.env`: `PORT`, `CORS_ORIGIN`

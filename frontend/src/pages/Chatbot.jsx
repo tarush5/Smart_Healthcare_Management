@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Send, Bot, User, Sparkles } from 'lucide-react'
-
-const ML_URL = 'http://localhost:8000'
+import { ML_URL } from '../config'
 
 const INITIAL_MESSAGES = [
   {

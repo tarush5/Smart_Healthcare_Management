@@ -7,9 +7,17 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
-const DB_PATH = path.join(__dirname, 'healthcare.db');
+const fs = require('fs');
+
+const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, 'healthcare.db');
 
 function initDatabase() {
+  // Ensure database directory exists
+  const dbDir = path.dirname(DB_PATH);
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+  }
+
   const db = new Database(DB_PATH);
   
   // Enable WAL mode for better performance
@@ -64,7 +72,11 @@ function initDatabase() {
   // Seed data if empty
   const count = db.prepare('SELECT COUNT(*) as count FROM patients').get();
   if (count.count === 0) {
-    seedData(db);
+    try {
+      seedData(db);
+    } catch (err) {
+      console.error('⚠️  Seeding failed (non-fatal):', err.message);
+    }
   }
 
   return db;

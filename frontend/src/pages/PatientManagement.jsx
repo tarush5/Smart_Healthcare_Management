@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Search, Plus, X, User, Phone, Mail, Droplet, MapPin, FileText } from 'lucide-react'
-
-const API_URL = 'http://localhost:3001/api'
+import { API_URL } from '../config'
 
 export default function PatientManagement() {
   const [patients, setPatients] = useState([])

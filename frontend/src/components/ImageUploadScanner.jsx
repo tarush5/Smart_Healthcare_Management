@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { UploadCloud, FileText, Brain, Activity, ShieldAlert, CheckCircle } from 'lucide-react'
-
-const ML_URL = 'http://localhost:8000'
+import { ML_URL } from '../config'
 
 export default function ImageUploadScanner() {
   const [file, setFile] = useState(null)

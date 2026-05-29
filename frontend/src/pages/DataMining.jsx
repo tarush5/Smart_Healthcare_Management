@@ -4,8 +4,7 @@ import {
   BarChart, Bar, Cell, Legend
 } from 'recharts'
 import { Database, GitBranch, Layers, TrendingUp } from 'lucide-react'
-
-const ML_URL = 'http://localhost:8000'
+import { ML_URL } from '../config'
 
 const CustomTooltip = ({ active, payload }) => {
   if (!active || !payload?.length) return null

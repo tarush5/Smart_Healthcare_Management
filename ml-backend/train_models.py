@@ -4,10 +4,18 @@ Trains 4 algorithms per disease, compares accuracy, saves the best model.
 """
 
 import os
+import sys
 import json
 import numpy as np
 import pandas as pd
 import joblib
+
+# Fix Windows console encoding for unicode characters
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -18,8 +26,15 @@ from sklearn.metrics import (accuracy_score, precision_score, recall_score,
                               f1_score, confusion_matrix, classification_report)
 from sklearn.pipeline import Pipeline
 
-DATASET_DIR = os.path.join(os.path.dirname(__file__), '..', 'datasets')
-MODEL_DIR = os.path.join(os.path.dirname(__file__), '..', 'models')
+# Container-safe path resolution
+def get_path(folder_name):
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    if base_dir == '/' or base_dir == '':
+        return os.path.join(os.path.dirname(__file__), folder_name)
+    return os.path.join(base_dir, folder_name)
+
+DATASET_DIR = get_path('datasets')
+MODEL_DIR = get_path('models')
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 

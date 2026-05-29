@@ -5,9 +5,7 @@ import {
   Radar, AreaChart, Area, Legend
 } from 'recharts'
 import { Users, Activity, ShieldAlert, TrendingUp, HeartPulse, Brain } from 'lucide-react'
-
-const API_URL = 'http://localhost:3001/api'
-const ML_URL = 'http://localhost:8000'
+import { API_URL, ML_URL } from '../config'
 
 const COLORS = ['#6366f1', '#8b5cf6', '#3b82f6', '#06b6d4', '#22c55e', '#f59e0b', '#ef4444']
 

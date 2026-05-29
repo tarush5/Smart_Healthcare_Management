@@ -274,6 +274,9 @@ a:hover { color: var(--accent-primary); }
 .sidebar-footer {
   padding: var(--space-4) var(--space-6);
   border-top: 1px solid var(--border-glass);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .sidebar-status {
@@ -291,6 +294,13 @@ a:hover { color: var(--accent-primary); }
   background: var(--success);
   box-shadow: 0 0 8px var(--success);
   animation: pulse-dot 2s infinite;
+  flex-shrink: 0;
+}
+
+.status-dot.offline {
+  background: var(--danger);
+  box-shadow: 0 0 8px var(--danger);
+  animation: none;
 }
 
 @keyframes pulse-dot {

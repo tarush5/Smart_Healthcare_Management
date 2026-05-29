@@ -6,10 +6,25 @@ Modeled after Kaggle Heart Disease, Pima Diabetes, and Chronic Kidney Disease da
 import numpy as np
 import pandas as pd
 import os
+import sys
+
+# Fix Windows console encoding for unicode characters
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
 
 np.random.seed(42)
 
-DATASET_DIR = os.path.join(os.path.dirname(__file__), '..', 'datasets')
+# Container-safe path resolution
+def get_path(folder_name):
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    if base_dir == '/' or base_dir == '':
+        return os.path.join(os.path.dirname(__file__), folder_name)
+    return os.path.join(base_dir, folder_name)
+
+DATASET_DIR = get_path('datasets')
 os.makedirs(DATASET_DIR, exist_ok=True)
 
 
