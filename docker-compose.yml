@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: healthcare-backend
+    restart: always
+    environment:
+      - PORT=3001
+      - DATABASE_PATH=/app/data/healthcare.db
+      - CORS_ORIGIN=*
+    ports:
+      - "3001:3001"
+    volumes:
+      - sqlite_data:/app/data
+
+  ml-backend:
+    build: ./ml-backend
+    container_name: healthcare-ml-backend
+    restart: always
+    environment:
+      - CORS_ORIGIN=*
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    container_name: healthcare-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - ml-backend
+
+volumes:
+  sqlite_data:
