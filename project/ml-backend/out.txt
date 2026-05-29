@@ -1,0 +1,1 @@
+200 {"prediction":0,"probability":13.25,"risk_level":"Low","disease":"Heart Disease","model_used":"Logistic Regression","interpretation":"Negative for heart disease with 13.2% probability."}
