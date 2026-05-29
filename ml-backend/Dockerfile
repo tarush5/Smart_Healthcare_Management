@@ -15,6 +15,7 @@ COPY . .
 # Build step: Pre-generate datasets, pre-train models, and pre-bake static graphs
 RUN python generate_datasets.py && python train_models.py && python visualizations.py
 
+# EXPOSE is kept for documentation, Render routes port dynamically via the PORT env
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
